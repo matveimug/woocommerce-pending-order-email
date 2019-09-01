@@ -132,6 +132,15 @@ class WC_Pending_Order_Email extends WC_Email {
 		return ob_get_clean();
 	}
 
+	/**
+	 * Default content to show below main email content.
+	 *
+	 * @since 3.7.0
+	 * @return string
+	 */
+	public function get_default_additional_content() {
+		return __( 'Congrats on the order.', 'woocommerce' );
+	}
 
 	/**
 	 * Initialize Settings Form Fields
