@@ -30,7 +30,10 @@ class WC_Pending_Order_Email extends WC_Email {
 		// these define the locations of the templates that this email should use, we'll just use the new order template since this email is similar
 		$this->template_html  = 'emails/admin-new-order.php';
 		$this->template_plain = 'emails/plain/admin-new-order.php';
-
+		$this->placeholders   = array(
+			'{order_date}'   => '',
+			'{order_number}' => '',
+		);
 		// Trigger
 		add_action( 'woocommerce_new_order', array( $this, 'trigger' ), 10, 2 );
 
@@ -100,16 +103,17 @@ class WC_Pending_Order_Email extends WC_Email {
 	 * @return string
 	 */
 	public function get_content_html() {
-		ob_start();
-		woocommerce_get_template( $this->template_html, array(
-			'order'              => $this->object,
-			'email_heading'      => $this->get_heading(),
-			'additional_content' => $this->get_additional_content(),
-			'sent_to_admin'      => true,
-			'plain_text'         => false,
-			'email'              => $this,
-		) );
-		return ob_get_clean();
+		return wc_get_template_html(
+			$this->template_html,
+			array(
+				'order'              => $this->object,
+				'email_heading'      => $this->get_heading(),
+				'additional_content' => $this->get_additional_content(),
+				'sent_to_admin'      => true,
+				'plain_text'         => false,
+				'email'              => $this,
+			)
+		);
 	}
 
 
@@ -120,16 +124,17 @@ class WC_Pending_Order_Email extends WC_Email {
 	 * @return string
 	 */
 	public function get_content_plain() {
-		ob_start();
-		woocommerce_get_template( $this->template_plain, array(
-			'order'              => $this->object,
-			'email_heading'      => $this->get_heading(),
-			'additional_content' => $this->get_additional_content(),
-			'sent_to_admin'      => true,
-			'plain_text'         => true,
-			'email'              => $this,
-		) );
-		return ob_get_clean();
+		return wc_get_template_html(
+			$this->template_plain,
+			array(
+				'order'              => $this->object,
+				'email_heading'      => $this->get_heading(),
+				'additional_content' => $this->get_additional_content(),
+				'sent_to_admin'      => true,
+				'plain_text'         => true,
+				'email'              => $this,
+			)
+		);
 	}
 
 	/**
@@ -148,7 +153,7 @@ class WC_Pending_Order_Email extends WC_Email {
 	 * @since 2.0
 	 */
 	public function init_form_fields() {
-
+		$placeholder_text  = sprintf( __( 'Available placeholders: %s', 'woocommerce' ), '<code>' . implode( '</code>, <code>', array_keys( $this->placeholders ) ) . '</code>' );
 		$this->form_fields = array(
 			'enabled'    => array(
 				'title'   => 'Enable/Disable',
