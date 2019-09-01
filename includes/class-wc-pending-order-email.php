@@ -71,27 +71,25 @@ class WC_Pending_Order_Email extends WC_Email {
 	 * @since 0.1
 	 * @param int $order_id
 	 */
-	public function trigger( $order_id ) {
+	public function trigger( $order_id, $order = false ) {
 
-		// bail if no order ID is present
-		if ( ! $order_id )
-			return;
+		$this->setup_locale();
 
-		// setup order object
-		$this->object = new WC_Order( $order_id );
+		if ( $order_id && ! is_a( $order, 'WC_Order' ) ) {
+			$order = wc_get_order( $order_id );
+		}
 
-		// replace variables in the subject/headings
-		$this->find[] = '{order_date}';
-		$this->replace[] = date_i18n( woocommerce_date_format(), strtotime( $this->object->order_date ) );
+		if ( is_a( $order, 'WC_Order' ) ) {
+			$this->object                         = $order;
+			$this->placeholders['{order_date}']   = wc_format_datetime( $this->object->get_date_created() );
+			$this->placeholders['{order_number}'] = $this->object->get_order_number();
+		}
 
-		$this->find[] = '{order_number}';
-		$this->replace[] = $this->object->get_order_number();
+		if ( $this->is_enabled() && $this->get_recipient() ) {
+			$this->send( $this->get_recipient(), $this->get_subject(), $this->get_content(), $this->get_headers(), $this->get_attachments() );
+		}
 
-		if ( ! $this->is_enabled() || ! $this->get_recipient() )
-			return;
-
-		// woohoo, send the email!
-		$this->send( $this->get_recipient(), $this->get_subject(), $this->get_content(), $this->get_headers(), $this->get_attachments() );
+		$this->restore_locale();
 	}
 
 
@@ -104,8 +102,12 @@ class WC_Pending_Order_Email extends WC_Email {
 	public function get_content_html() {
 		ob_start();
 		woocommerce_get_template( $this->template_html, array(
-			'order'         => $this->object,
-			'email_heading' => $this->get_heading()
+			'order'              => $this->object,
+			'email_heading'      => $this->get_heading(),
+			'additional_content' => $this->get_additional_content(),
+			'sent_to_admin'      => true,
+			'plain_text'         => false,
+			'email'              => $this,
 		) );
 		return ob_get_clean();
 	}
@@ -120,8 +122,12 @@ class WC_Pending_Order_Email extends WC_Email {
 	public function get_content_plain() {
 		ob_start();
 		woocommerce_get_template( $this->template_plain, array(
-			'order'         => $this->object,
-			'email_heading' => $this->get_heading()
+			'order'              => $this->object,
+			'email_heading'      => $this->get_heading(),
+			'additional_content' => $this->get_additional_content(),
+			'sent_to_admin'      => true,
+			'plain_text'         => true,
+			'email'              => $this,
 		) );
 		return ob_get_clean();
 	}
