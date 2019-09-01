@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name: WooCommerce Pending Order Email
- * Plugin URI: http://www.skyverge.com/blog/how-to-add-a-custom-woocommerce-email/
+ * Plugin URI: https://github.com/matveimug/woocommerce-pending-order-email
  * Description: Plugin for adding a custom WooCommerce email that sends admins an email when an order is received
- * Author: SkyVerge
+ * Author: Madius
  * Author URI: http://www.madisvaher.ee
  * Version: 0.1
  *
