@@ -155,18 +155,29 @@ class WC_Pending_Order_Email extends WC_Email {
 				'default'     => ''
 			),
 			'subject'    => array(
-				'title'       => 'Subject',
+				'title'       => __( 'Subject', 'woocommerce' ),
 				'type'        => 'text',
-				'description' => sprintf( 'This controls the email subject line. Leave blank to use the default subject: <code>%s</code>.', $this->subject ),
-				'placeholder' => '',
-				'default'     => ''
+				'desc_tip'    => true,
+				'description' => $placeholder_text,
+				'placeholder' => $this->get_default_subject(),
+				'default'     => '',
 			),
 			'heading'    => array(
-				'title'       => 'Email Heading',
+				'title'       => __( 'Email heading', 'woocommerce' ),
 				'type'        => 'text',
-				'description' => sprintf( __( 'This controls the main heading contained within the email notification. Leave blank to use the default heading: <code>%s</code>.' ), $this->heading ),
-				'placeholder' => '',
-				'default'     => ''
+				'desc_tip'    => true,
+				'description' => $placeholder_text,
+				'placeholder' => $this->get_default_heading(),
+				'default'     => '',
+			),
+			'additional_content' => array(
+				'title'       => __( 'Additional content', 'woocommerce' ),
+				'description' => __( 'Text to appear below the main email content.', 'woocommerce' ) . ' ' . $placeholder_text,
+				'css'         => 'width:400px; height: 75px;',
+				'placeholder' => __( 'N/A', 'woocommerce' ),
+				'type'        => 'textarea',
+				'default'     => $this->get_default_additional_content(),
+				'desc_tip'    => true,
 			),
 			'email_type' => array(
 				'title'       => 'Email type',
