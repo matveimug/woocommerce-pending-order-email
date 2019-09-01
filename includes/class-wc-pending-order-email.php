@@ -103,8 +103,7 @@ class WC_Pending_Order_Email extends WC_Email {
 	 * @return string
 	 */
 	public function get_content_html() {
-		ob_start();
-		woocommerce_get_template( $this->template_html, array(
+		return wc_get_template_html( $this->template_html, array(
 			'order'              => $this->object,
 			'email_heading'      => $this->get_heading(),
 			'additional_content' => $this->get_additional_content(),
@@ -112,7 +111,6 @@ class WC_Pending_Order_Email extends WC_Email {
 			'plain_text'         => false,
 			'email'              => $this,
 		) );
-		return ob_get_clean();
 	}
 
 
@@ -123,8 +121,7 @@ class WC_Pending_Order_Email extends WC_Email {
 	 * @return string
 	 */
 	public function get_content_plain() {
-		ob_start();
-		woocommerce_get_template( $this->template_plain, array(
+		return wc_get_template_html( $this->template_plain, array(
 			'order'              => $this->object,
 			'email_heading'      => $this->get_heading(),
 			'additional_content' => $this->get_additional_content(),
@@ -132,7 +129,6 @@ class WC_Pending_Order_Email extends WC_Email {
 			'plain_text'         => true,
 			'email'              => $this,
 		) );
-		return ob_get_clean();
 	}
 
 	/**
