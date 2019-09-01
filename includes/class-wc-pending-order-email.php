@@ -84,6 +84,7 @@ if ( ! class_exists( 'WC_Pending_Order_Email' ) ) :
 				$this->object                         = $order;
 				$this->placeholders['{order_date}']   = wc_format_datetime( $this->object->get_date_created() );
 				$this->placeholders['{order_number}'] = $this->object->get_order_number();
+				$this->placeholders['{order_print}'] = $this->object;
 			}
 
 			if ( $this->is_enabled() && $this->get_recipient() ) {
