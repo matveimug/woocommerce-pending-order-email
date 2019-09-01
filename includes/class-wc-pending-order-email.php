@@ -27,9 +27,9 @@ if ( ! class_exists( 'WC_Pending_Order_Email' ) ) :
 		 * Constructor.
 		 */
 		public function __construct() {
-			$this->id             = 'new_order';
-			$this->title          = __( 'New order', 'woocommerce' );
-			$this->description    = __( 'New order emails are sent to chosen recipient(s) when a new order is received.', 'woocommerce' );
+			$this->id             = 'pending_order';
+			$this->title          = __( 'Pending order', 'woocommerce' );
+			$this->description    = __( 'Pending order emails are sent to chosen recipient(s) when a new order is received.', 'woocommerce' );
 			$this->template_html  = 'emails/admin-new-order.php';
 			$this->template_plain = 'emails/plain/admin-new-order.php';
 			$this->placeholders   = array(
