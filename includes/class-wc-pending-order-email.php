@@ -203,4 +203,4 @@ if ( ! class_exists( 'WC_Pending_Order_Email' ) ) :
 
 endif;
 
-return new WC_Pending_Order_Email();
+//return new WC_Pending_Order_Email();
