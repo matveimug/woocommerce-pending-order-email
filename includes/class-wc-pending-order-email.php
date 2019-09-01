@@ -31,8 +31,9 @@ class WC_Pending_Order_Email extends WC_Email {
 		$this->template_html  = 'emails/admin-new-order.php';
 		$this->template_plain = 'emails/plain/admin-new-order.php';
 
-		// Triggers for this email.
-		add_action( 'woocommerce_new_order', array( $this, 'trigger' ) );
+		// Trigger on thankyou
+//		add_action( 'woocommerce_checkout_order_processed', array( $this, 'trigger' ) );
+		add_action( 'woocommerce_new_order', array( $this, 'trigger' ), 10, 2 );
 
 		// Call parent constructor to load any other defaults not explicity defined here
 		parent::__construct();
@@ -71,72 +72,59 @@ class WC_Pending_Order_Email extends WC_Email {
 	 * @since 0.1
 	 * @param int $order_id
 	 */
-	public function trigger( $order_id, $order = false ) {
-		$this->setup_locale();
+	public function trigger( $order_id ) {
 
-		if ( $order_id && ! is_a( $order, 'WC_Order' ) ) {
-			$order = wc_get_order( $order_id );
-		}
+		// bail if no order ID is present
+		if ( ! $order_id )
+			return;
 
-		if ( is_a( $order, 'WC_Order' ) ) {
-			$this->object                         = $order;
-			$this->placeholders['{order_date}']   = wc_format_datetime( $this->object->get_date_created() );
-			$this->placeholders['{order_number}'] = $this->object->get_order_number();
-		}
+		// setup order object
+		$this->object = new WC_Order( $order_id );
 
-		if ( $this->is_enabled() && $this->get_recipient() ) {
-			$this->send( $this->get_recipient(), $this->get_subject(), $this->get_content(), $this->get_headers(), $this->get_attachments() );
-		}
+		// replace variables in the subject/headings
+		$this->find[] = '{order_date}';
+		$this->replace[] = date_i18n( woocommerce_date_format(), strtotime( $this->object->order_date ) );
 
-		$this->restore_locale();
+		$this->find[] = '{order_number}';
+		$this->replace[] = $this->object->get_order_number();
+
+		if ( ! $this->is_enabled() || ! $this->get_recipient() )
+			return;
+
+		// woohoo, send the email!
+		$this->send( $this->get_recipient(), $this->get_subject(), $this->get_content(), $this->get_headers(), $this->get_attachments() );
 	}
 
+
 	/**
-	 * Get content html.
+	 * get_content_html function.
 	 *
+	 * @since 0.1
 	 * @return string
 	 */
 	public function get_content_html() {
-		return wc_get_template_html(
-			$this->template_html,
-			array(
-				'order'              => $this->object,
-				'email_heading'      => $this->get_heading(),
-				'additional_content' => $this->get_additional_content(),
-				'sent_to_admin'      => true,
-				'plain_text'         => false,
-				'email'              => $this,
-			)
-		);
+		ob_start();
+		woocommerce_get_template( $this->template_html, array(
+			'order'         => $this->object,
+			'email_heading' => $this->get_heading()
+		) );
+		return ob_get_clean();
 	}
 
+
 	/**
-	 * Get content plain.
+	 * get_content_plain function.
 	 *
+	 * @since 0.1
 	 * @return string
 	 */
 	public function get_content_plain() {
-		return wc_get_template_html(
-			$this->template_plain,
-			array(
-				'order'              => $this->object,
-				'email_heading'      => $this->get_heading(),
-				'additional_content' => $this->get_additional_content(),
-				'sent_to_admin'      => true,
-				'plain_text'         => true,
-				'email'              => $this,
-			)
-		);
-	}
-
-	/**
-	 * Default content to show below main email content.
-	 *
-	 * @since 3.7.0
-	 * @return string
-	 */
-	public function get_default_additional_content() {
-		return __( 'Congratulations on the sale.', 'woocommerce' );
+		ob_start();
+		woocommerce_get_template( $this->template_plain, array(
+			'order'         => $this->object,
+			'email_heading' => $this->get_heading()
+		) );
+		return ob_get_clean();
 	}
 
 
